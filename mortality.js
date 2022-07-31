@@ -6,7 +6,8 @@ async function init() {
     .attr("width", width + margin.left + margin.right + 50)
     .attr("height", height + margin.top + margin.bottom + 50)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")").attr("class", "mainSVGDiv");
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    .attr("class", "mainSVGDiv");
 
   d3.csv("./World-Data.csv").then(function (data) {
     // CREATING A different lists
@@ -20,7 +21,10 @@ async function init() {
       }
     }
     countryData = Array.from(S);
-    var yearList = [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,2012, 2013, 2014, 2015, 2016, 2017];
+    var yearList = [
+      2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
+      2013, 2014, 2015, 2016, 2017,
+    ];
 
     //find min and max Mortality
     let Mortality_Max = 0;
@@ -39,13 +43,12 @@ async function init() {
     hashCountry[0] = hashCountry[0].substring(1);
     hashCountry = hashCountry.join(" ");
     console.log(hashCountry);
-    if(window.location.hash.length<1){
-      window.location.hash="India"
+    if (window.location.hash.length < 1) {
+      window.location.hash = "India";
     }
 
-
     var keys = Object.keys(MortalityData[0]);
-    keys = keys.splice(0, 20)
+    keys = keys.splice(0, 20);
 
     Mortality_Min = Mortality_Min - Mortality_Min * 0.1;
     const countryList = Array.from(S);
@@ -61,91 +64,93 @@ async function init() {
       })
       .text(function (d) {
         return d;
-      }).attr("selected",function(d){
-        if(d==hashCountry){
+      })
+      .attr("selected", function (d) {
+        if (d == hashCountry) {
           return "selected";
         }
       });
 
-
-      var selected = d3.select("#dropDown").node().value;
+    var selected = d3.select("#dropDown").node().value;
     selectedText = d3.select("#dropDown option:checked").text();
+    
+    const gdpButton = d3.select("#gdpButton");
+    gdpButton.on("click", function () {
+      window.location.href = "./index.html#" + selectedText;
+      console.log(selectedText, window.location.hash);
+    });
+    
     var selectedCountryList = [];
-    arrayData = []
+    arrayData = [];
     console.log(hashCountry);
     for (i = 0; i < MortalityData.length; i++) {
-        if (MortalityData[i]["Country"]==hashCountry) {
-            selectedCountryList = (MortalityData[i]);
-            break;
-        }
+      if (MortalityData[i]["Country"] == hashCountry) {
+        selectedCountryList = MortalityData[i];
+        break;
+      }
     }
 
-    d3.select("#dropDown").on("change", function () {     
+    d3.select("#dropDown").on("change", function () {
+      // changeValues(selectedText, DataArray);
+      selected = d3.select("#dropDown").node().value;
+      selectedText = d3.select("#dropDown option:checked").text();
+      d3.selectAll("circle").style("fill", "#69b3a2");
+      d3.selectAll("circle").style("opacity", 0.3);
+      window.location.hash = selectedText;
 
-        // changeValues(selectedText, DataArray);
-        selected = d3.select("#dropDown").node().value;
-        selectedText = d3.select("#dropDown option:checked").text();
-        d3.selectAll("circle").style("fill", "#69b3a2");
-        d3.selectAll("circle").style("opacity", 0.3);
-        window.location.hash=selectedText
+      const mortalityButton = d3.select("#mortalityButton");
+      selectedText = d3.select("#dropDown option:checked").text();
+      mortalityButton.on("click", function () {
+        window.location.href = "./index.html#" + selectedText;
+      });
 
-        const mortalityButton = d3.select("#mortalityButton");
-        mortalityButton.on("click", function () {
-          selectedText = d3.select("#dropDown option:checked").text();
-          window.location.href = "./index.html#"+selectedText;
-        })
-
-        for(i=0;i<MortalityData.length;i++){
-            if(MortalityData[i]["Country"]==selectedText){
-                selectedCountryList = MortalityData[i];
-                break;
-            }
+      for (i = 0; i < MortalityData.length; i++) {
+        if (MortalityData[i]["Country"] == selectedText) {
+          selectedCountryList = MortalityData[i];
+          break;
         }
-        for(i = 0;i<keys.length;i++){
-            arrayData.push([keys[i], selectedCountryList[keys[i]]]);
-        }
+      }
+      for (i = 0; i < keys.length; i++) {
+        arrayData.push([keys[i], selectedCountryList[keys[i]]]);
+      }
 
-        changeValues(selectedText);
+      changeValues(selectedText);
 
-
-
-        d3.select("svg")
+      d3.select("svg")
         .selectAll("circle")
-        .data(arrayData , function (d) {
+        .data(arrayData, function (d) {
           return d;
         })
         .attr("cx", function (d, i) {
-          return x(Number(d[0]))
-        }).attr("cy", function (d) {
+          return x(Number(d[0]));
+        })
+        .attr("cy", function (d) {
           return y(Number(d[1]));
         });
-  
-      });
-
-      const gdpButton = d3.select("#gdpButton");
-      gdpButton.on("click", function () {
-        selectedText = d3.select("#dropDown option:checked").text();
-        window.location.href = "./index.html#"+selectedText;
-        console.log(selectedText, window.location.hash);
-      })
+    });
 
     var x = d3.scaleLinear().domain([2001, 2016]).range([0, width]);
     var y = d3.scaleLinear().domain([Mortality_Min, 3000]).range([height, 0]);
-    svg.append("g").attr("transform", "translate(0," + height + ")").call(d3.axisBottom(x));
+    svg
+      .append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
     svg.append("g").call(d3.axisLeft(y));
 
     changeValues(hashCountry);
-
+ 
 
     function changeValues(selectedCountry) {
-    clear_all = []
+      clear_all = [];
       d3.selectAll("circle").data(clear_all).exit().remove();
       d3.selectAll(".tooltip").data(clear_all).exit().remove();
+      d3.selectAll(".line").data(clear_all).exit().remove();
 
-      DataArray = []
-      for(i = 0;i<keys.length;i++){
+
+      DataArray = [];
+      for (i = 0; i < keys.length; i++) {
         DataArray.push([keys[i], selectedCountryList[keys[i]]]);
-    }
+      }
       svg
         .selectAll(".dot")
         .data(DataArray)
@@ -155,7 +160,7 @@ async function init() {
           return "blueDot";
         })
         .attr("cx", function (d, i) {
-          return x(Number(d[0]))
+          return x(Number(d[0]));
         })
         .attr("cy", function (d) {
           return y(Number(d[1]));
@@ -171,7 +176,13 @@ async function init() {
             .style("transform", "scale(1.2)")
             .style("top", event.pageY - 180 + "px")
             .style("left", event.pageX - 10 + "px");
-          tooltip.innerHTML ="Country: "+selectedCountry+"<br />Year: " + i[0] + "<br/> Mortality: " + Math.round(Number(i[1]));
+          tooltip.innerHTML =
+            "Country: " +
+            selectedCountry +
+            "<br />Year: " +
+            i[0] +
+            "<br/> Mortality: " +
+            Math.round(Number(i[1]));
         })
         .on("mouseout", function (d) {
           div
@@ -181,9 +192,30 @@ async function init() {
             .style("transform", "scale(0.8)");
         });
 
-        var lineGenerator = d3.line();
-        var pathString = lineGenerator(selectedCountryList);
-        // d3.select('path').attr('d', pathString);
+      var lineGenerator = d3.line();
+      var pathString = lineGenerator(selectedCountryList);
+      // d3.select('path').attr('d', pathString);
+      var group = d3.select("#my_dataviz").select("svg").append("g");
+      // .attr('id', countryid);
+      group
+        .append("path")
+        .datum(DataArray)
+        .attr("class", "line")
+        .attr("transform", "translate(" + 120 + "," + 10 + ")")
+        .style("fill", "none")
+        .style("stroke", "#0004ff")
+        .style("stroke-width", "3")
+        .attr("d", function (d) {
+          return d3
+            .line()
+            .x(function (d) {
+              return x(Number(d[0]));
+            })
+            .y(function (d) {
+              //console.log(d);
+              return y(Number(d[1]));
+            })(d);
+        });
 
       //labels
       var div = d3
@@ -216,6 +248,13 @@ async function init() {
         .style("font-weight", "bold")
         .text("Year");
     }
-
+    console.log(window.location.pathname.split("/")[2]);
+    if(window.location.pathname.split("/")[2]=="mortality.html"){
+      var notes = document.getElementById("notes1");
+      notes.innerHTML = "*The data is from the <a class='' href='https://www.worldbank.org/'>World Bank</a>";
+      notes.innerHTML = "<b>Mortality Rate:</b> Notice a sudden dip in the Mortality rate for "+hashCountry+" in 2020 due to <i>COVID-19</i>."
+      notes.style.fontSize = "18px";
+    }
+   
   });
 }

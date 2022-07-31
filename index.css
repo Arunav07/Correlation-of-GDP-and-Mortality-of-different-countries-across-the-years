@@ -248,6 +248,12 @@ select#dropDownId {
 }
 #my_dataviz{
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border: 1px solid slategray;
+  margin-bottom: 10px;
 }
 div.tooltip {
   position: absolute;

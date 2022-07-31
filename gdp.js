@@ -68,8 +68,13 @@ async function init() {
       });
 
 
-      var selected = d3.select("#dropDown").node().value;
+    var selected = d3.select("#dropDown").node().value;
     selectedText = d3.select("#dropDown option:checked").text();
+    const mortalityButton = d3.select("#mortalityButton");
+    mortalityButton.on("click", function () {
+      window.location.href = "./mortality.html#"+selectedText;
+    })
+
     var selectedCountryList = [];
     arrayData = []
     console.log(hashCountry);
@@ -122,14 +127,7 @@ async function init() {
   
       });
 
-      const mortalityButton = d3.select("#mortalityButton");
-      mortalityButton.on("click", function () {
-        selectedText = d3.select("#dropDown option:checked").text();
-        window.location.href = "./mortality.html#"+selectedText;
-        window.location.reload();
-      })
-
-    var x = d3.scaleLinear().domain([2001, 2016]).range([0, width]);
+    var x = d3.scaleLinear().domain([2001, 2020]).range([0, width]);
     var y = d3.scaleLinear().domain([GDP_Min, 120000]).range([height, 0]);
     svg.append("g").attr("transform", "translate(0," + height + ")").call(d3.axisBottom(x));
     svg.append("g").call(d3.axisLeft(y));
@@ -141,6 +139,7 @@ async function init() {
     clear_all = []
       d3.selectAll("circle").data(clear_all).exit().remove();
       d3.selectAll(".tooltip").data(clear_all).exit().remove();
+      d3.selectAll(".line").data(clear_all).exit().remove();
 
       DataArray = []
       for(i = 0;i<keys.length;i++){
@@ -181,9 +180,26 @@ async function init() {
             .style("transform", "scale(0.8)");
         });
 
-        var lineGenerator = d3.line();
-        var pathString = lineGenerator(selectedCountryList);
-        // d3.select('path').attr('d', pathString);
+        var group = d3.select("#my_dataviz").select("svg").append('g')
+        // .attr('id', countryid);
+    group.append("path")
+        .datum(DataArray)
+        .attr("class", "line")
+        .attr("transform", "translate(" + 120 + "," + 10 + ")")
+        .style("fill", "none")
+        .style("stroke", "#ffabab")
+        .style("stroke-width", "3")
+        .attr("d", function (d) {
+            return d3.line()
+                .x(function (d) {
+                    return x(Number(d[0]))
+                })
+                .y(function (d) {
+                    //console.log(d);
+                    return y(Number(d[1]));
+                })(d)
+        })
+
 
       //labels
       var div = d3
@@ -216,6 +232,13 @@ async function init() {
         .style("font-weight", "bold")
         .text("Year");
     }
-
+    //annotation
+    console.log(window.location.pathname.split("/")[2]);
+  if(window.location.pathname.split("/")[2]=="index.html"){
+    notes.innerHTML = "*The data is from the <a class='' href='https://www.worldbank.org/'>World Bank</a>";
+    notes.innerHTML = "<b>GDP per Capita:</b> Notice a sudden dip in the GDP of "+hashCountry+" in 2008-2009 due to <i>Great Recession<i/> and another dip in 2020 due to the <i>COVID-19 Pandemic</i>."
+    notes.style.fontSize = "18px";
+  }
+ 
   });
 }
