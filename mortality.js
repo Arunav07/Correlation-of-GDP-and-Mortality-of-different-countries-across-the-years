@@ -175,8 +175,8 @@ async function init() {
             .duration(200)
             .style("opacity", 0.9)
             .style("transform", "scale(1.2)")
-            .style("top", event.pageY - 180 + "px")
-            .style("left", event.pageX - 10 + "px");
+            .style("top", event.pageY - 310 + "px")
+            .style("left", event.pageX -20 + "px");
           tooltip.innerHTML =
             "Country: " +
             selectedCountry +
