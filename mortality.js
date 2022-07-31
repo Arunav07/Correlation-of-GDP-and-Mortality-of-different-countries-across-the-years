@@ -138,7 +138,8 @@ async function init() {
     svg.append("g").call(d3.axisLeft(y));
 
     changeValues(hashCountry);
- 
+    
+    d3.select("svg").append("annotationBox").attr("class", "annotationBox")
 
     function changeValues(selectedCountry) {
       clear_all = [];
@@ -241,20 +242,19 @@ async function init() {
         .append("text")
         .attr("class", "x label")
         .attr("text-anchor", "end")
-        .attr("x", 250)
+        .attr("x", 550)
         .attr("y", 470)
         .attr("dy", ".25em")
         .style("fill", "Black")
         .style("font-weight", "bold")
         .text("Year");
     }
-    console.log(window.location.pathname.split("/")[2]);
-    if(window.location.pathname.split("/")[2]=="mortality.html"){
+
       var notes = document.getElementById("notes1");
       notes.innerHTML = "*The data is from the <a class='' href='https://www.worldbank.org/'>World Bank</a>";
       notes.innerHTML = "<b>Mortality Rate:</b> Notice a sudden dip in the Mortality rate for "+hashCountry+" in 2020 due to <i>COVID-19</i>."
       notes.style.fontSize = "18px";
-    }
+    
    
   });
 }

@@ -1,5 +1,6 @@
 var DataArray = [];
 async function init() {
+
   var svg = d3
     .select("#my_dataviz")
     .append("svg")
@@ -111,9 +112,6 @@ async function init() {
         }
 
         changeValues(selectedText);
-
-
-
         d3.select("svg")
         .selectAll("circle")
         .data(arrayData , function (d) {
@@ -124,7 +122,6 @@ async function init() {
         }).attr("cy", function (d) {
           return y(Number(d[1]));
         });
-  
       });
 
     var x = d3.scaleLinear().domain([2001, 2020]).range([0, width]);
@@ -225,20 +222,20 @@ async function init() {
         .append("text")
         .attr("class", "x label")
         .attr("text-anchor", "end")
-        .attr("x", 250)
+        .attr("x", 550)
         .attr("y", 470)
         .attr("dy", ".25em")
         .style("fill", "Black")
         .style("font-weight", "bold")
         .text("Year");
-    }
+    
+    
+      }
     //annotation
-    console.log(window.location.pathname.split("/")[2]);
-  if(window.location.pathname.split("/")[2]=="index.html"){
+   
     notes.innerHTML = "*The data is from the <a class='' href='https://www.worldbank.org/'>World Bank</a>";
     notes.innerHTML = "<b>GDP per Capita:</b> Notice a sudden dip in the GDP of "+hashCountry+" in 2008-2009 due to <i>Great Recession<i/> and another dip in 2020 due to the <i>COVID-19 Pandemic</i>."
     notes.style.fontSize = "18px";
-  }
- 
+
   });
 }

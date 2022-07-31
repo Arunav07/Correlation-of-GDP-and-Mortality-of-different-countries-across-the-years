@@ -232,5 +232,21 @@ async function init() {
             d3.select("#errorLabel").style("display", "none")
         }
       });
-  });
+
+      const notes2 = document.getElementById("notes2");
+      notes2.innerHTML = "The data is from the <a class='' href='https://www.worldbank.org/'>World Bank</a>";
+      notes2.innerHTML = "The parabolic nature of the graph shows that the data is indirectly proportional where if the GDP of a country is high, the mortality rate of the same tends to be low."
+        });
+
+        const mortalityButton = d3.select("#mortalityButton");
+        mortalityButton.on("click", function () {
+          window.location.href = "./mortality.html";
+          window.location.hash = "#India";
+        })
+        const gdpButton = d3.select("#gdpButton");
+        gdpButton.on("click", function () {
+          window.location.href = "./index.html";
+          window.location.hash = "#India";
+        })
+
 }

@@ -17,7 +17,7 @@ ul {
   justify-content: space-evenly;
 }
 nav button,
-a,
+nav a,
 .buttonDiv button {
   text-decoration: none;
   color: black;
