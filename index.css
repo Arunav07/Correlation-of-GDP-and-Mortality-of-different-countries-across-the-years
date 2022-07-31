@@ -277,3 +277,9 @@ div.tooltip {
   justify-content: center;
   margin: 2rem 
 }
+h1{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2rem;
+}
