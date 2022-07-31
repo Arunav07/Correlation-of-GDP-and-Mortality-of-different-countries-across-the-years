@@ -129,7 +129,7 @@ async function init() {
         });
     });
 
-    var x = d3.scaleLinear().domain([2001, 2016]).range([0, width]);
+    var x = d3.scaleLinear().domain([2001, 2020]).range([0, width]);
     var y = d3.scaleLinear().domain([Mortality_Min, 3000]).range([height, 0]);
     svg
       .append("g")
