@@ -8,7 +8,7 @@ async function init() {
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")").attr("class", "mainSVGDiv");
 
-  d3.csv("./World-Data.csv").then(function (data) {
+  d3.csv("https://github.com/Arunav07/Correlation-of-GDP-and-Mortality-of-different-countries-across-the-years/blob/master/World-Data.csv").then(function (data) {
     // CREATING A different lists
     S = new Set();
     var mortalityData = [];
