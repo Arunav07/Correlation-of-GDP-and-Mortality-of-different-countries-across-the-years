@@ -6,37 +6,45 @@ async function init() {
     .attr("width", width + margin.left + margin.right + 50)
     .attr("height", height + margin.top + margin.bottom + 50)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")").attr("class", "mainSVGDiv");
 
   d3.csv("./World-Data.csv").then(function (data) {
     // CREATING A different lists
     S = new Set();
-    var gdpData = [];
+    var GDPData = [];
 
     for (i = 0; i < data.length; i++) {
       S.add(data[i]["Country"]);
       if (data[i]["Series"] == "GDP") {
-        gdpData.push(data[i]);
+        GDPData.push(data[i]);
       }
     }
     countryData = Array.from(S);
     var yearList = [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,2012, 2013, 2014, 2015, 2016, 2017];
 
-    //find min and max GDP and mortality
+    //find min and max GDP
     let GDP_Max = 0;
     let GDP_Min = GDP_Max;
-    for (i = 0; i < gdpData.length; i++) {
+    for (i = 0; i < GDPData.length; i++) {
       for (j = 2001; j <= 2021; j++) {
-        if (gdpData[i][j] > GDP_Max) {
-          GDP_Max = gdpData[i][j];
+        if (GDPData[i][j] > GDP_Max) {
+          GDP_Max = GDPData[i][j];
         }
-        if (gdpData[i][j] < GDP_Min) {
-          GDP_Min = gdpData[i][j];
+        if (GDPData[i][j] < GDP_Min) {
+          GDP_Min = GDPData[i][j];
         }
       }
     }
+    var hashCountry = window.location.hash.split("%20");
+    hashCountry[0] = hashCountry[0].substring(1);
+    hashCountry = hashCountry.join(" ");
+    console.log(hashCountry);
+    if(window.location.hash.length<1){
+      window.location.hash="India"
+    }
 
-    var keys = Object.keys(gdpData[0]);
+
+    var keys = Object.keys(GDPData[0]);
     keys = keys.splice(0, 20)
 
     GDP_Min = GDP_Min - GDP_Min * 0.1;
@@ -53,15 +61,22 @@ async function init() {
       })
       .text(function (d) {
         return d;
+      }).attr("selected",function(d){
+        if(d==hashCountry){
+          return "selected";
+        }
       });
 
-    var selected = d3.select("#dropDown").node().value;
+
+      var selected = d3.select("#dropDown").node().value;
     selectedText = d3.select("#dropDown option:checked").text();
     var selectedCountryList = [];
     arrayData = []
-    for (i = 0; i < gdpData.length; i++) {
-        if (gdpData[i]["Country"] == "Afghanistan") {
-            selectedCountryList.push(gdpData[i]);
+    console.log(hashCountry);
+    for (i = 0; i < GDPData.length; i++) {
+        if (GDPData[i]["Country"]==hashCountry) {
+            selectedCountryList = (GDPData[i]);
+            break;
         }
     }
 
@@ -72,17 +87,27 @@ async function init() {
         selectedText = d3.select("#dropDown option:checked").text();
         d3.selectAll("circle").style("fill", "#69b3a2");
         d3.selectAll("circle").style("opacity", 0.3);
-        for(i=0;i<gdpData.length;i++){
-            if(gdpData[i]["Country"]==selectedText){
-                selectedCountryList = gdpData[i];
+        window.location.hash=selectedText
+
+        const mortalityButton = d3.select("#mortalityButton");
+        mortalityButton.on("click", function () {
+          selectedText = d3.select("#dropDown option:checked").text();
+          window.location.href = "./mortality.html#"+selectedText;
+        })
+
+        for(i=0;i<GDPData.length;i++){
+            if(GDPData[i]["Country"]==selectedText){
+                selectedCountryList = GDPData[i];
                 break;
             }
         }
         for(i = 0;i<keys.length;i++){
             arrayData.push([keys[i], selectedCountryList[keys[i]]]);
         }
-        console.log(arrayData);
-        changeValues(selectedText, gdpData);
+
+        changeValues(selectedText);
+
+
 
         d3.select("svg")
         .selectAll("circle")
@@ -96,15 +121,21 @@ async function init() {
         });
   
       });
-    var x = d3.scaleLinear().domain([2001, 2020]).range([0, width]);
-    var y = d3.scaleLinear().domain([GDP_Min, 120000]).range([height, 0]);
 
+      const mortalityButton = d3.select("#mortalityButton");
+      mortalityButton.on("click", function () {
+        selectedText = d3.select("#dropDown option:checked").text();
+        window.location.href = "./mortality.html#"+selectedText;
+        window.location.reload();
+      })
+
+    var x = d3.scaleLinear().domain([2001, 2016]).range([0, width]);
+    var y = d3.scaleLinear().domain([GDP_Min, 120000]).range([height, 0]);
     svg.append("g").attr("transform", "translate(0," + height + ")").call(d3.axisBottom(x));
     svg.append("g").call(d3.axisLeft(y));
 
-    changeValues("Afghanistan");
+    changeValues(hashCountry);
 
-    
 
     function changeValues(selectedCountry) {
     clear_all = []
@@ -115,8 +146,6 @@ async function init() {
       for(i = 0;i<keys.length;i++){
         DataArray.push([keys[i], selectedCountryList[keys[i]]]);
     }
-    console.log(selectedText);
-    console.log(DataArray);
       svg
         .selectAll(".dot")
         .data(DataArray)
@@ -126,7 +155,6 @@ async function init() {
           return "orangeDot";
         })
         .attr("cx", function (d, i) {
-            // console.log(d[String(2001+i)]);
           return x(Number(d[0]))
         })
         .attr("cy", function (d) {
@@ -143,7 +171,7 @@ async function init() {
             .style("transform", "scale(1.2)")
             .style("top", event.pageY - 180 + "px")
             .style("left", event.pageX - 10 + "px");
-          tooltip.innerHTML ="Year: " + i[0] + "<br/> GDP = $" + Math.round(Number(i[1]));
+          tooltip.innerHTML ="Country: "+selectedCountry+"<br />Year: " + i[0] + "<br/> GDP: " + Math.round(Number(i[1]));
         })
         .on("mouseout", function (d) {
           div
@@ -152,6 +180,10 @@ async function init() {
             .style("opacity", 0)
             .style("transform", "scale(0.8)");
         });
+
+        var lineGenerator = d3.line();
+        var pathString = lineGenerator(selectedCountryList);
+        // d3.select('path').attr('d', pathString);
 
       //labels
       var div = d3

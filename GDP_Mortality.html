@@ -10,7 +10,7 @@
         <script src="https://d3js.org/d3.v6.js" defer></script>
     <script defer src="gdpMortality.js"></script>
     <script>
-      margin = {top: 10, right: 30, bottom: 30, left: 60},
+      margin = {top: 10, right: 30, bottom: 30, left: 120},
     width = 1100 - margin.left - margin.right,
     height = 450 - margin.top - margin.bottom;
     </script>
@@ -19,13 +19,13 @@
         <nav>
             <ul>
                 <li>
-                    <a id="previous" onclick="moveToScene('GDP')" href="index.html">GDP</a>
+                    <a id="previous" onclick="moveToScene('GDP')" href="index.html"><button>GDP</button></a>
                 </li>
                 <li>
-                    <a id="next" onclick="moveToScene('Mortality')" href="mortality.html" >Mortality</a>
+                    <a id="next" onclick="moveToScene('Mortality')" href="mortality.html" ><button>Mortality</button></a>
                 </li>
                 <li>
-                    <a href="GDP_Mortality.html"><button>Correlation between GDP and Mortality</button></a>
+                    <a href="GDP_Mortality.html" ><button>Correlation between GDP and Mortality</button></a>
                 </li>
     
             </ul>

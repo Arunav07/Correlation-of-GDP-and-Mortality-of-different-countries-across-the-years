@@ -11,12 +11,12 @@ async function init() {
   d3.csv("./World-Data.csv").then(function (data) {
     // CREATING A different lists
     S = new Set();
-    var mortalityData = [];
+    var MortalityData = [];
 
     for (i = 0; i < data.length; i++) {
       S.add(data[i]["Country"]);
       if (data[i]["Series"] == "Mortality") {
-        mortalityData.push(data[i]);
+        MortalityData.push(data[i]);
       }
     }
     countryData = Array.from(S);
@@ -25,18 +25,26 @@ async function init() {
     //find min and max Mortality
     let Mortality_Max = 0;
     let Mortality_Min = Mortality_Max;
-    for (i = 0; i < mortalityData.length; i++) {
+    for (i = 0; i < MortalityData.length; i++) {
       for (j = 2001; j <= 2021; j++) {
-        if (mortalityData[i][j] > Mortality_Max) {
-          Mortality_Max = mortalityData[i][j];
+        if (MortalityData[i][j] > Mortality_Max) {
+          Mortality_Max = MortalityData[i][j];
         }
-        if (mortalityData[i][j] < Mortality_Min) {
-          Mortality_Min = mortalityData[i][j];
+        if (MortalityData[i][j] < Mortality_Min) {
+          Mortality_Min = MortalityData[i][j];
         }
       }
     }
+    var hashCountry = window.location.hash.split("%20");
+    hashCountry[0] = hashCountry[0].substring(1);
+    hashCountry = hashCountry.join(" ");
+    console.log(hashCountry);
+    if(window.location.hash.length<1){
+      window.location.hash="India"
+    }
 
-    var keys = Object.keys(mortalityData[0]);
+
+    var keys = Object.keys(MortalityData[0]);
     keys = keys.splice(0, 20)
 
     Mortality_Min = Mortality_Min - Mortality_Min * 0.1;
@@ -54,23 +62,24 @@ async function init() {
       .text(function (d) {
         return d;
       }).attr("selected",function(d){
-        if(d=="India"){
+        if(d==hashCountry){
           return "selected";
         }
       });
 
 
-    var selected = d3.select("#dropDown").node().value;
+      var selected = d3.select("#dropDown").node().value;
     selectedText = d3.select("#dropDown option:checked").text();
     var selectedCountryList = [];
     arrayData = []
-    for (i = 0; i < mortalityData.length; i++) {
-        if (mortalityData[i]["Country"] == "India") {
-            selectedCountryList = (mortalityData[i]);
+    console.log(hashCountry);
+    for (i = 0; i < MortalityData.length; i++) {
+        if (MortalityData[i]["Country"]==hashCountry) {
+            selectedCountryList = (MortalityData[i]);
             break;
         }
     }
-    console.log(selectedCountryList);
+
     d3.select("#dropDown").on("change", function () {     
 
         // changeValues(selectedText, DataArray);
@@ -78,17 +87,27 @@ async function init() {
         selectedText = d3.select("#dropDown option:checked").text();
         d3.selectAll("circle").style("fill", "#69b3a2");
         d3.selectAll("circle").style("opacity", 0.3);
-        for(i=0;i<mortalityData.length;i++){
-            if(mortalityData[i]["Country"]==selectedText){
-                selectedCountryList = mortalityData[i];
+        window.location.hash=selectedText
+
+        const mortalityButton = d3.select("#mortalityButton");
+        mortalityButton.on("click", function () {
+          selectedText = d3.select("#dropDown option:checked").text();
+          window.location.href = "./index.html#"+selectedText;
+        })
+
+        for(i=0;i<MortalityData.length;i++){
+            if(MortalityData[i]["Country"]==selectedText){
+                selectedCountryList = MortalityData[i];
                 break;
             }
         }
         for(i = 0;i<keys.length;i++){
             arrayData.push([keys[i], selectedCountryList[keys[i]]]);
         }
-        console.log(arrayData);
+
         changeValues(selectedText);
+
+
 
         d3.select("svg")
         .selectAll("circle")
@@ -103,15 +122,20 @@ async function init() {
   
       });
 
-    var x = d3.scaleLinear().domain([2001, 2016]).range([0, width]);
-    var y = d3.scaleLinear().domain([Mortality_Min, Mortality_Max]).range([height, 0]);
+      const gdpButton = d3.select("#gdpButton");
+      gdpButton.on("click", function () {
+        selectedText = d3.select("#dropDown option:checked").text();
+        window.location.href = "./index.html#"+selectedText;
+        console.log(selectedText, window.location.hash);
+      })
 
+    var x = d3.scaleLinear().domain([2001, 2016]).range([0, width]);
+    var y = d3.scaleLinear().domain([Mortality_Min, 3000]).range([height, 0]);
     svg.append("g").attr("transform", "translate(0," + height + ")").call(d3.axisBottom(x));
     svg.append("g").call(d3.axisLeft(y));
 
-    changeValues("India");
+    changeValues(hashCountry);
 
-    
 
     function changeValues(selectedCountry) {
     clear_all = []
@@ -122,7 +146,6 @@ async function init() {
       for(i = 0;i<keys.length;i++){
         DataArray.push([keys[i], selectedCountryList[keys[i]]]);
     }
-
       svg
         .selectAll(".dot")
         .data(DataArray)
@@ -132,7 +155,6 @@ async function init() {
           return "blueDot";
         })
         .attr("cx", function (d, i) {
-            // console.log(d[String(2001+i)]);
           return x(Number(d[0]))
         })
         .attr("cy", function (d) {
