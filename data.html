@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Data</title>
+    <meta charset="utf-8" />
+
+    <!-- Load d3.js -->
+    <script src="https://d3js.org/d3.v6.js" defer></script>
+
+    <script defer src="index2.js"></script>
+    <link rel="stylesheet" href="index.css"></link>
+
+    <script>
+        margin = {top: 25, right: 30, bottom: 120, left: 60},
+            width = 980 - margin.left - margin.right,
+            height = 550 - margin.top - margin.bottom;
+    </script>
+    </head>
+    <style>
+        .top_level_window {
+            color: #373c40;
+            text-align: center;
+            width: 100%;
+            font-weight: bold;
+            margin: auto;
+            font-size: 23px;
+            padding: 0px;
+            border-style: solid;
+            border-bottom-width: 1px;
+            border-width: 0px 0px 1px 0px;
+            padding-bottom: 10px;
+        }
+
+        .bottom_level_window {
+            color: #373c40;
+            text-align: left;
+            width: 100%;
+            margin: auto;
+            font-size: 20px;
+            padding: 0px;
+        }
+
+        .main_window {
+            width: -webkit-fill-available;
+            margin-right: auto;
+            margin-left: auto;
+            padding-right: 13px;
+            padding-left: 13px;
+        }
+
+        .scene_box {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            justify-content: flex-end;
+        }
+
+        .navigation {
+            width: 9%;
+            text-align: center;
+            float: left;
+        }
+
+        .graph_box {
+            width: min-content;
+            float: left;
+            height: calc(500px + 2rem);
+            border-style: solid;
+            border-width: 1px;
+            padding: 5px;
+            border-color: #dae0e5;
+            float: left;
+            margin-top: 15px;
+        }
+
+       .blue {
+            background-color: blue;
+        }
+
+        .btn {
+            display: inline-block;
+            font-weight: 400;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            border: none;
+            padding: .375rem .75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: .25rem;
+            transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+            margin: 0 15px
+        }
+
+        .btn-primary {
+            color: #fff;
+        }
+
+        .line_orange {
+            fill: none;
+            stroke: #ffabab;
+            stroke-width: 3;
+        }
+
+        .line_blue {
+            fill: none;
+            stroke: #0004ff;
+            stroke-width: 3;
+        }
+
+        .dot_orange {
+            fill: #ffabab;
+            stroke: #fff;
+        }
+
+        .dot_blue {
+            fill: #0004ff;
+            stroke: #fff;
+        }
+
+        .tooltip {
+            background-color: #f2f2f5;
+            border-style: solid;
+            border-width: 1px;
+            padding: 5px;
+        }
+
+        .hoverText {
+            font-weight: bold;
+        }
+        .annotationBox {
+            height: 50px;
+            width: 350px;
+            fill: #dae0e5;
+        }
+
+
+        .annotationText {
+            font-size: 15px;
+        }
+
+        .message_box {
+            width: 82%;
+            margin: auto;
+            border-style: solid;
+            border-width: 1px;
+            border-color: #dae0e5;
+        }
+
+        .country {
+            float: left;
+            font-weight: bold;
+            margin-right: 5px;
+            color: black;
+        }
+
+        .scene3box {
+            visibility: hidden;
+            display: inline-block;
+            display: flex;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        #chartBoxId{
+display: flex;
+align-items: center;
+justify-content: center;
+        }
+        #radioButtonId{
+            display: flex;
+            gap: 1rem;
+        }
+        select#dropDownId{
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            border: none;
+            outline: none;
+            border-bottom: 0.5px solid #dae0e5;
+        }
+    </style>
+      <body onload="init()">
+        <nav>
+            <ul>
+                <li>
+                    <a  id="previous"  href="index.html">GDP</a>
+                </li>
+                <li>
+                    <a href="Population Estimate.html">Population Estimate</a>
+                </li>
+                <li>
+                    <a id="next"  href="data.html">Mortality</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="main_window">
+            <div class="top_level_window">
+                How World GDP per Capita and Mortality changes over time
+            </div>
+            <div class="scene_box">
+                <!-- <div id="previous" class="navigation" >
+                    <button type="button" class="btn btn-primary blue" onclick="moveToScene('Previous')"><a >Previous</a></button>
+                </div> -->
+                <div class="graph_box">
+                    <div class="scene3box" id="scene3box_id" >
+                        <div style="float: left;display: flex;">
+                            <div class="country">Country</div>
+                            <select id="dropDownId">
+                            </select>
+                        </div>
+                        <div style="float: left;">
+                            <form id="radioButtonId">
+                                <label><input type="radio" name="gdpmortality" value="0" checked> GDP</label>
+                                <label><input type="radio" name="gdpmortality" value="1"> Mortality</label>
+                            </form>
+                        </div>
+                    </div>
+                    <div id="chartBoxId">
+                        <svg>
+                            <div>
+                            </div>
+                        </svg>
+                    </div>
+                    <div id ="notes" class = "bottom_level_window"></div>
+                </div>
+                <!-- <div id="next" class="navigation" >
+                    <button type="button" class="btn btn-primary    blue" onclick="moveToScene('Next')"><a >Next</a></button>
+                </div> -->
+            </div>
+            <div>
+                <hr/>
+            </div>
+        </div>
+    </body>
